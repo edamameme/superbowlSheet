@@ -261,14 +261,6 @@ function App() {
             >
               Enter Your Predictions
             </button>
-
-            {predictions.length > 0 && (
-              <div className="admin-actions">
-                <button onClick={resetAll} className="danger-button">
-                  Reset All Data
-                </button>
-              </div>
-            )}
           </div>
         )}
 
@@ -293,6 +285,8 @@ function App() {
             currentPlayer={currentPlayer}
             onUpdatePrediction={updatePrediction}
             predictionsLocked={predictionsLocked}
+            theme={theme}
+            onUpdateTheme={updateTheme}
           />
         )}
 
@@ -313,6 +307,7 @@ function App() {
             onUpdatePrediction={updatePrediction}
             predictionsLocked={predictionsLocked}
             onToggleLock={togglePredictionsLock}
+            onResetAll={resetAll}
           />
         )}
 

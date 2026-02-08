@@ -162,6 +162,25 @@ body {
   margin-top: 20px;
 }
 
+.switch-teams-button {
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--primary-blue);
+  border: 2px solid var(--primary-blue);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 15px 10px;
+}
+
+.switch-teams-button:hover {
+  background: var(--primary-blue);
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
 @media (max-width: 768px) {
   .app-header h1 {
     font-size: 1.8rem;

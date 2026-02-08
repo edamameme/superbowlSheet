@@ -82,7 +82,9 @@
   gap: 10px;
 }
 
-.edit-button, .save-button, .cancel-button {
+.edit-button,
+.save-button,
+.cancel-button {
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
@@ -133,6 +135,36 @@
   transform: translateY(-2px);
 }
 
+.switch-teams-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #ffffff;
+}
+
+.switch-teams-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* If theme is seahawks, use patriots style (Red) */
+.switch-teams-btn.patriots-style {
+  background-color: #C60C30;
+  /* Patriots Red */
+  border: 1px solid #002244;
+}
+
+/* If theme is patriots, use seahawks style (Green) */
+.switch-teams-btn.seahawks-style {
+  background-color: #69BE28;
+  /* Seahawks Green */
+  border: 1px solid #002244;
+}
+
 .predictions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -181,7 +213,8 @@
   font-weight: 500;
 }
 
-.edit-input, .score-input {
+.edit-input,
+.score-input {
   width: 100%;
   padding: 8px 12px;
   border: 2px solid var(--gray);
@@ -189,7 +222,8 @@
   font-size: 1rem;
 }
 
-.edit-input:focus, .score-input:focus {
+.edit-input:focus,
+.score-input:focus {
   outline: none;
   border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.1);
@@ -242,7 +276,9 @@
     flex-direction: column;
   }
 
-  .edit-button, .save-button, .cancel-button {
+  .edit-button,
+  .save-button,
+  .cancel-button {
     width: 100%;
   }
 }

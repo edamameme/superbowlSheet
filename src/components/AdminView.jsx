@@ -16,7 +16,8 @@ const AdminView = ({
   onUpdateCategoryPoints,
   onUpdatePrediction,
   predictionsLocked,
-  onToggleLock
+  onToggleLock,
+  onResetAll
 }) => {
   const [showPrintView, setShowPrintView] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -314,6 +315,9 @@ const AdminView = ({
           </button>
           <button onClick={() => setShowPrintView(true)} className="print-button">
             Print View 🖨️
+          </button>
+          <button onClick={onResetAll} className="danger-button">
+            🗑️ Reset All Data
           </button>
         </div>
       </div>

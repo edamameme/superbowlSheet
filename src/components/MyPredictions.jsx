@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './MyPredictions.css';
 
-const MyPredictions = ({ predictions, scores, categories, onSelectPlayer, currentPlayer, onUpdatePrediction, predictionsLocked }) => {
+const MyPredictions = ({ predictions, scores, categories, onSelectPlayer, currentPlayer, onUpdatePrediction, predictionsLocked, theme, onUpdateTheme }) => {
   const [selectedPlayer, setSelectedPlayer] = useState(currentPlayer || (predictions.length > 0 ? predictions[0].playerName : null));
   const [isEditing, setIsEditing] = useState(false);
   const [editedPredictions, setEditedPredictions] = useState({});
@@ -92,14 +92,22 @@ const MyPredictions = ({ predictions, scores, categories, onSelectPlayer, curren
             </div>
             <div className="edit-buttons">
               {!isEditing ? (
-                <button
-                  onClick={handleEditClick}
-                  className={`edit-button ${predictionsLocked ? 'locked' : ''}`}
-                  disabled={predictionsLocked}
-                  title={predictionsLocked ? 'Predictions are locked by admin' : 'Edit your predictions'}
-                >
-                  {predictionsLocked ? '🔒 TOO LATE!' : '✏️ Edit Predictions'}
-                </button>
+                <>
+                  <button
+                    onClick={() => onUpdateTheme(theme === 'seahawks' ? 'patriots' : 'seahawks')}
+                    className={`switch-teams-btn ${theme === 'seahawks' ? 'patriots-style' : 'seahawks-style'}`}
+                  >
+                    Switch Teams
+                  </button>
+                  <button
+                    onClick={handleEditClick}
+                    className={`edit-button ${predictionsLocked ? 'locked' : ''}`}
+                    disabled={predictionsLocked}
+                    title={predictionsLocked ? 'Predictions are locked by admin' : 'Edit your predictions'}
+                  >
+                    {predictionsLocked ? '🔒 TOO LATE!' : '✏️ Edit Predictions'}
+                  </button>
+                </>
               ) : (
                 <>
                   <button onClick={handleSaveEdit} className="save-button">
