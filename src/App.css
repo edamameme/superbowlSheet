@@ -94,10 +94,11 @@ body {
 }
 
 .players-status {
-  background: var(--light-gray);
+  background: linear-gradient(135deg, rgba(0, 68, 204, 0.1), rgba(204, 0, 0, 0.1));
   border-radius: 10px;
   padding: 20px;
   margin: 30px 0;
+  border: 2px solid var(--primary-blue);
 }
 
 .players-list {
@@ -106,12 +107,14 @@ body {
 }
 
 .players-list li {
-  background: var(--white);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.95));
   padding: 12px;
   margin: 8px 0;
   border-radius: 8px;
-  border-left: 4px solid var(--success);
+  border-left: 4px solid var(--primary-blue);
+  border-right: 3px solid var(--primary-red);
   font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .primary-button {

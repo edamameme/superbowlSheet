@@ -1,0 +1,248 @@
+/* My Predictions View */
+.my-predictions {
+  padding: 20px 0;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.predictions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.predictions-header h2 {
+  color: var(--primary-blue);
+  font-size: 2rem;
+}
+
+.player-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-selector label {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.player-select {
+  padding: 10px 15px;
+  border: 2px solid var(--primary-blue);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--white);
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.player-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.2);
+}
+
+.player-predictions-view {
+  background: linear-gradient(135deg, rgba(0, 68, 204, 0.05), rgba(204, 0, 0, 0.05));
+  border-radius: 15px;
+  padding: 30px;
+  border: 3px solid var(--primary-blue);
+}
+
+.player-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.player-info-header h3 {
+  color: var(--primary-blue);
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+}
+
+.player-score {
+  color: var(--dark-gray);
+  font-size: 1.1rem;
+}
+
+.player-score strong {
+  color: var(--primary-red);
+  font-size: 1.3rem;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-button, .save-button, .cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit-button {
+  background: var(--primary-blue);
+  color: var(--white);
+}
+
+.edit-button:hover {
+  background: var(--dark-blue);
+  transform: translateY(-2px);
+}
+
+.edit-button.locked {
+  background: var(--dark-gray);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.edit-button.locked:hover {
+  transform: none;
+  background: var(--dark-gray);
+}
+
+.save-button {
+  background: var(--success);
+  color: var(--white);
+}
+
+.save-button:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}
+
+.cancel-button {
+  background: var(--danger);
+  color: var(--white);
+}
+
+.cancel-button:hover {
+  background: var(--dark-red);
+  transform: translateY(-2px);
+}
+
+.predictions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.prediction-item {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.95));
+  border-radius: 10px;
+  padding: 20px;
+  border-left: 4px solid var(--primary-blue);
+  border-right: 3px solid var(--primary-red);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.prediction-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.prediction-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: var(--primary-blue);
+}
+
+.points-badge {
+  background: var(--primary-red);
+  color: var(--white);
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 0.85rem;
+}
+
+.prediction-answer {
+  margin-top: 10px;
+}
+
+.answer-text {
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.edit-input, .score-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid var(--gray);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.edit-input:focus, .score-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(0, 68, 204, 0.1);
+}
+
+.score-edit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.score-input {
+  width: 80px;
+}
+
+.score-edit span {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .predictions-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .predictions-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .player-selector {
+    width: 100%;
+  }
+
+  .player-select {
+    flex: 1;
+  }
+
+  .predictions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .player-info-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .edit-buttons {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .edit-button, .save-button, .cancel-button {
+    width: 100%;
+  }
+}

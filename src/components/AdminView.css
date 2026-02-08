@@ -24,10 +24,11 @@
 }
 
 .scoring-guide {
-  background: var(--light-gray);
+  background: linear-gradient(135deg, rgba(0, 68, 204, 0.08), rgba(204, 0, 0, 0.08));
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 30px;
+  border: 2px solid var(--primary-blue);
 }
 
 .predictions-table-container {
@@ -156,11 +157,12 @@
 }
 
 .settings-section {
-  background: var(--light-gray);
+  background: linear-gradient(135deg, rgba(0, 68, 204, 0.08), rgba(204, 0, 0, 0.08));
   border-radius: 10px;
   padding: 25px;
   margin-bottom: 30px;
   border-left: 5px solid var(--primary-blue);
+  border-right: 3px solid var(--primary-red);
 }
 
 .settings-section h3 {
@@ -349,14 +351,43 @@
   background: var(--dark-blue);
 }
 
+.lock-button {
+  padding: 10px 20px;
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lock-button.unlocked {
+  background: var(--success);
+}
+
+.lock-button.unlocked:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}
+
+.lock-button.locked {
+  background: var(--danger);
+}
+
+.lock-button.locked:hover {
+  background: var(--dark-red);
+  transform: translateY(-2px);
+}
+
 .current-settings {
   display: flex;
   gap: 20px;
   padding: 15px;
-  background: var(--light-gray);
+  background: linear-gradient(90deg, rgba(0, 68, 204, 0.1), rgba(204, 0, 0, 0.1));
   border-radius: 8px;
   margin-bottom: 20px;
   flex-wrap: wrap;
+  border: 2px solid var(--primary-blue);
 }
 
 .point-badge {
@@ -432,4 +463,31 @@
     background: var(--light-gray);
     border-radius: 10px;
   }
+}
+
+/* Editable predictions */
+.prediction-value.clickable {
+  cursor: pointer;
+  position: relative;
+  padding-right: 25px;
+  transition: all 0.2s ease;
+}
+
+.prediction-value.clickable:hover {
+  background: rgba(0, 68, 204, 0.15);
+  transform: scale(1.05);
+}
+
+.edit-icon {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.prediction-value.clickable:hover .edit-icon {
+  opacity: 1;
 }

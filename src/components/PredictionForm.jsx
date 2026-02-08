@@ -79,30 +79,27 @@ const PredictionForm = ({ onSubmit, existingPlayers, onCancel, teamNames, catego
           />
         </div>
 
-        {/* Theme Selector */}
-        <div className="form-section theme-section">
-          <h3>🎨 Choose Your Theme</h3>
-          <div className="theme-selector-form">
+        {/* Team Picker */}
+        <div className="form-section team-picker-section">
+          <h3>🏈 Who do you want to win?</h3>
+          <div className="team-picker">
             <div
-              className={`theme-option-small ${selectedTheme === 'default' ? 'active' : ''}`}
-              onClick={() => { setSelectedTheme('default'); onUpdateTheme('default'); }}
-            >
-              <div className="theme-preview-small default-theme"></div>
-              <span>Default</span>
-            </div>
-            <div
-              className={`theme-option-small ${selectedTheme === 'seahawks' ? 'active' : ''}`}
+              className={`team-choice ${selectedTheme === 'seahawks' ? 'active' : ''}`}
               onClick={() => { setSelectedTheme('seahawks'); onUpdateTheme('seahawks'); }}
             >
-              <div className="theme-preview-small seahawks-theme"></div>
-              <span>Seahawks</span>
+              <div className="team-logo">
+                <img src={`${import.meta.env.BASE_URL}seahawks-logo.svg`} alt="Seahawks" className="team-logo-img" />
+              </div>
+              <span className="team-name-choice">Seattle Seahawks</span>
             </div>
             <div
-              className={`theme-option-small ${selectedTheme === 'patriots' ? 'active' : ''}`}
+              className={`team-choice ${selectedTheme === 'patriots' ? 'active' : ''}`}
               onClick={() => { setSelectedTheme('patriots'); onUpdateTheme('patriots'); }}
             >
-              <div className="theme-preview-small patriots-theme"></div>
-              <span>Patriots</span>
+              <div className="team-logo">
+                <img src={`${import.meta.env.BASE_URL}patriots-logo.svg`} alt="Patriots" className="team-logo-img" />
+              </div>
+              <span className="team-name-choice">New England Patriots</span>
             </div>
           </div>
         </div>

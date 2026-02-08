@@ -13,7 +13,10 @@ const AdminView = ({
   onUpdateCategories,
   onAddCategory,
   onRemoveCategory,
-  onUpdateCategoryPoints
+  onUpdateCategoryPoints,
+  onUpdatePrediction,
+  predictionsLocked,
+  onToggleLock
 }) => {
   const [showPrintView, setShowPrintView] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -51,6 +54,34 @@ const AdminView = ({
       return `${prediction.finalScoreTeam1 || '?'} - ${prediction.finalScoreTeam2 || '?'}`;
     }
     return prediction[key] || '-';
+  };
+
+  const handleEditPrediction = (playerName, key) => {
+    const prediction = predictions.find(p => p.playerName === playerName);
+    if (!prediction) return;
+
+    const currentValue = key === 'finalScore'
+      ? `${prediction.finalScoreTeam1 || ''} - ${prediction.finalScoreTeam2 || ''}`
+      : prediction[key] || '';
+
+    const newValue = prompt(
+      `Edit ${key} for ${playerName}:\n\nCurrent value: ${currentValue}\n\nEnter new value:`,
+      currentValue
+    );
+
+    if (newValue !== null && newValue !== currentValue) {
+      if (key === 'finalScore') {
+        const [team1, team2] = newValue.split('-').map(s => s.trim());
+        onUpdatePrediction(playerName, {
+          finalScoreTeam1: team1 || '',
+          finalScoreTeam2: team2 || ''
+        });
+      } else {
+        onUpdatePrediction(playerName, {
+          [key]: newValue
+        });
+      }
+    }
   };
 
   const handlePrint = () => {
@@ -165,13 +196,6 @@ const AdminView = ({
           <h3>🎨 Color Theme</h3>
           <div className="theme-selector">
             <div
-              className={`theme-option ${selectedTheme === 'default' ? 'active' : ''}`}
-              onClick={() => handleThemeChange('default')}
-            >
-              <div className="theme-preview default-theme"></div>
-              <span>Default (Blue & Red)</span>
-            </div>
-            <div
               className={`theme-option ${selectedTheme === 'seahawks' ? 'active' : ''}`}
               onClick={() => handleThemeChange('seahawks')}
             >
@@ -278,6 +302,13 @@ const AdminView = ({
       <div className="admin-header">
         <h2>Admin / Host View</h2>
         <div className="header-buttons">
+          <button
+            onClick={onToggleLock}
+            className={`lock-button ${predictionsLocked ? 'locked' : 'unlocked'}`}
+            title={predictionsLocked ? 'Click to unlock predictions' : 'Click to lock predictions'}
+          >
+            {predictionsLocked ? '🔒 Predictions Locked' : '🔓 Lock Predictions'}
+          </button>
           <button onClick={() => setShowSettings(true)} className="settings-button">
             ⚙️ Settings
           </button>
@@ -316,8 +347,13 @@ const AdminView = ({
                 </td>
                 {predictions.map((p) => (
                   <td key={p.id} className="prediction-cell">
-                    <div className="prediction-value">
+                    <div
+                      className="prediction-value clickable"
+                      onClick={() => handleEditPrediction(p.playerName, cat.key)}
+                      title="Click to edit"
+                    >
                       {getPredictionValue(p, cat.key)}
+                      <span className="edit-icon">✏️</span>
                     </div>
                     <div className="point-buttons">
                       <button

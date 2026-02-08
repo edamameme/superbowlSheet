@@ -3,11 +3,14 @@ import './App.css';
 import PredictionForm from './components/PredictionForm';
 import AdminView from './components/AdminView';
 import Leaderboard from './components/Leaderboard';
+import MyPredictions from './components/MyPredictions';
 
 function App() {
-  const [view, setView] = useState('home'); // home, form, admin, leaderboard
+  const [view, setView] = useState('home'); // home, form, admin, leaderboard, myPredictions
   const [predictions, setPredictions] = useState([]);
   const [scores, setScores] = useState({});
+  const [currentPlayer, setCurrentPlayer] = useState(null);
+  const [predictionsLocked, setPredictionsLocked] = useState(false);
 
   // Game settings
   const [teamNames, setTeamNames] = useState({ team1: 'Seattle Seahawks', team2: 'New England Patriots' });
@@ -38,12 +41,14 @@ function App() {
     const savedTeamNames = localStorage.getItem('superBowlTeamNames');
     const savedTheme = localStorage.getItem('superBowlTheme');
     const savedCategories = localStorage.getItem('superBowlCategories');
+    const savedLocked = localStorage.getItem('superBowlPredictionsLocked');
 
     if (savedPredictions) setPredictions(JSON.parse(savedPredictions));
     if (savedScores) setScores(JSON.parse(savedScores));
     if (savedTeamNames) setTeamNames(JSON.parse(savedTeamNames));
     if (savedTheme) setTheme(savedTheme);
     if (savedCategories) setCategories(JSON.parse(savedCategories));
+    if (savedLocked) setPredictionsLocked(JSON.parse(savedLocked));
   }, []);
 
   // Save predictions to localStorage
@@ -76,6 +81,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem('superBowlCategories', JSON.stringify(categories));
   }, [categories]);
+
+  // Save predictions locked state to localStorage
+  useEffect(() => {
+    localStorage.setItem('superBowlPredictionsLocked', JSON.stringify(predictionsLocked));
+  }, [predictionsLocked]);
 
   const addPrediction = (playerName, predictionData) => {
     const newPrediction = {
@@ -142,6 +152,21 @@ function App() {
     ));
   };
 
+  const updatePrediction = (playerName, predictionData) => {
+    setPredictions(prev => prev.map(p =>
+      p.playerName === playerName ? { ...p, ...predictionData } : p
+    ));
+  };
+
+  const viewMyPredictions = (playerName) => {
+    setCurrentPlayer(playerName);
+    setView('myPredictions');
+  };
+
+  const togglePredictionsLock = () => {
+    setPredictionsLocked(prev => !prev);
+  };
+
   return (
     <div className="app">
       <header className="app-header">
@@ -154,6 +179,9 @@ function App() {
           )}
           {predictions.length > 0 && (
             <>
+              <button onClick={() => setView('myPredictions')} className="nav-button">
+                My Predictions
+              </button>
               <button onClick={() => setView('admin')} className="nav-button">
                 Admin View
               </button>
@@ -217,6 +245,18 @@ function App() {
           />
         )}
 
+        {view === 'myPredictions' && (
+          <MyPredictions
+            predictions={predictions}
+            scores={scores}
+            categories={categories}
+            onSelectPlayer={setCurrentPlayer}
+            currentPlayer={currentPlayer}
+            onUpdatePrediction={updatePrediction}
+            predictionsLocked={predictionsLocked}
+          />
+        )}
+
         {view === 'admin' && (
           <AdminView
             predictions={predictions}
@@ -231,6 +271,9 @@ function App() {
             onAddCategory={addCategory}
             onRemoveCategory={removeCategory}
             onUpdateCategoryPoints={updateCategoryPoints}
+            onUpdatePrediction={updatePrediction}
+            predictionsLocked={predictionsLocked}
+            onToggleLock={togglePredictionsLock}
           />
         )}
 
