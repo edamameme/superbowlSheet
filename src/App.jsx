@@ -36,7 +36,7 @@ function App() {
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [predictionsLocked, setPredictionsLocked] = useState(false);
   const [teamNames, setTeamNames] = useState({ team1: 'Seattle Seahawks', team2: 'New England Patriots' });
-  const [theme, setTheme] = useState('seahawks');
+  const [theme, setTheme] = useState(() => localStorage.getItem('superbowl-theme') || 'seahawks');
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [loaded, setLoaded] = useState(false);
 
@@ -66,8 +66,11 @@ function App() {
         ...(state.scores || {})
       };
 
+      // Exclude theme from sync
+      const { theme, ...stateToSync } = state;
+
       saveState({
-        ...state,
+        ...stateToSync,
         predictions: mergedPredictions,
         scores: mergedScores,
       });
@@ -82,7 +85,7 @@ function App() {
       if (data.predictions) setPredictions(data.predictions);
       if (data.scores) setScores(data.scores);
       if (data.teamNames) setTeamNames(data.teamNames);
-      if (data.theme) setTheme(data.theme);
+      // Theme is now local-only, ignore remote theme
       if (data.categories) setCategories(data.categories);
       if (data.predictionsLocked !== undefined) setPredictionsLocked(data.predictionsLocked);
       setLoaded(true);
@@ -115,6 +118,7 @@ function App() {
   // Apply theme to document
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('superbowl-theme', theme);
   }, [theme]);
 
   const addPrediction = (playerName, predictionData) => {
