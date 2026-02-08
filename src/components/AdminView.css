@@ -1,3 +1,29 @@
+/* AdminView.css */
+
+.action-buttons {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.icon-button {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 1rem;
+}
+
+.icon-button:hover {
+  background-color: #f0f0f0;
+}
+
+.icon-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 .admin-view {
   padding: 20px 0;
 }
@@ -43,7 +69,8 @@
   min-width: 800px;
 }
 
-.predictions-table th, .predictions-table td {
+.predictions-table th,
+.predictions-table td {
   padding: 15px;
   text-align: left;
   border: 1px solid var(--gray);
@@ -85,9 +112,18 @@
   color: var(--white);
 }
 
-.small-points { background: var(--primary-blue); }
-.big-points { background: var(--primary-red); }
-.huge-points { background: var(--gold); color: var(--text-dark); }
+.small-points {
+  background: var(--primary-blue);
+}
+
+.big-points {
+  background: var(--primary-red);
+}
+
+.huge-points {
+  background: var(--gold);
+  color: var(--text-dark);
+}
 
 .manual-scoring {
   background: var(--light-gray);

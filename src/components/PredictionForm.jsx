@@ -4,29 +4,16 @@ import './PredictionForm.css';
 const PredictionForm = ({ onSubmit, existingPlayers, onCancel, teamNames, categories, theme, onUpdateTheme }) => {
   const [playerName, setPlayerName] = useState('');
   const [selectedTheme, setSelectedTheme] = useState(theme);
-  const [predictions, setPredictions] = useState({
-    // Game Predictions
-    firstTDTime: '',
-    firstScoreTeam: '',
-    finalScoreTeam1: '',
-    finalScoreTeam2: '',
-    overtime: '',
-    totalPoints: '',
-
-    // Commercial Predictions
-    carCommercials: '',
-    beerBrand: '',
-    cryptoAd: '',
-    bestCommercial: '',
-    weirdestCommercial: '',
-
-    // Halftime Show
-    openingSong: '',
-    closingSong: '',
-    totalSongs: '',
-    specialGuest: '',
-    costumeChanges: '',
-    playBiggestHit: ''
+  const [predictions, setPredictions] = useState(() => {
+    // Initialize state dynamically based on categories
+    const initial = {};
+    categories.forEach(cat => {
+      initial[cat.key] = '';
+    });
+    // Ensure composite fields are initialized
+    initial.finalScoreTeam1 = '';
+    initial.finalScoreTeam2 = '';
+    return initial;
   });
 
   const handleChange = (field, value) => {
@@ -104,316 +91,148 @@ const PredictionForm = ({ onSubmit, existingPlayers, onCancel, teamNames, catego
           </div>
         </div>
 
-        {/* Game Predictions */}
+        {/* Dynamic Game Predictions */}
         <div className="form-section">
           <h3>🏈 Game Predictions</h3>
 
-          <div className="form-group">
-            <label htmlFor="firstTDTime">What time will the first TD happen?</label>
-            <input
-              id="firstTDTime"
-              type="text"
-              value={predictions.firstTDTime}
-              onChange={(e) => handleChange('firstTDTime', e.target.value)}
-              placeholder="e.g., 7:32 Q1"
-              className="text-input"
-            />
-          </div>
+          {categories.map(cat => {
+            // Special handling for Final Score (Composite field)
+            if (cat.key === 'finalScore') {
+              return (
+                <div key={cat.key} className="form-group">
+                  <label>{cat.label}</label>
+                  <div className="score-inputs">
+                    <input
+                      type="number"
+                      value={predictions.finalScoreTeam1 || ''}
+                      onChange={(e) => handleChange('finalScoreTeam1', e.target.value)}
+                      placeholder={teamNames.team1}
+                      className="number-input"
+                      min="0"
+                    />
+                    <span className="score-separator">-</span>
+                    <input
+                      type="number"
+                      value={predictions.finalScoreTeam2 || ''}
+                      onChange={(e) => handleChange('finalScoreTeam2', e.target.value)}
+                      placeholder={teamNames.team2}
+                      className="number-input"
+                      min="0"
+                    />
+                  </div>
+                </div>
+              );
+            }
 
-          <div className="form-group">
-            <label>Which team scores first?</label>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="firstScoreTeam"
-                  value={teamNames.team1}
-                  checked={predictions.firstScoreTeam === teamNames.team1}
-                  onChange={(e) => handleChange('firstScoreTeam', e.target.value)}
-                />
-                {teamNames.team1}
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="firstScoreTeam"
-                  value={teamNames.team2}
-                  checked={predictions.firstScoreTeam === teamNames.team2}
-                  onChange={(e) => handleChange('firstScoreTeam', e.target.value)}
-                />
-                {teamNames.team2}
-              </label>
-            </div>
-          </div>
+            // Special handling for Team Selection
+            if (cat.type === 'team') {
+              return (
+                <div key={cat.key} className="form-group">
+                  <label>{cat.label}</label>
+                  <div className="radio-group">
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        name={cat.key}
+                        value={teamNames.team1}
+                        checked={predictions[cat.key] === teamNames.team1}
+                        onChange={(e) => handleChange(cat.key, e.target.value)}
+                      />
+                      {teamNames.team1}
+                    </label>
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        name={cat.key}
+                        value={teamNames.team2}
+                        checked={predictions[cat.key] === teamNames.team2}
+                        onChange={(e) => handleChange(cat.key, e.target.value)}
+                      />
+                      {teamNames.team2}
+                    </label>
+                  </div>
+                </div>
+              );
+            }
 
-          <div className="form-group">
-            <label>Final Score Prediction</label>
-            <div className="score-inputs">
-              <input
-                type="number"
-                value={predictions.finalScoreTeam1}
-                onChange={(e) => handleChange('finalScoreTeam1', e.target.value)}
-                placeholder={teamNames.team1}
-                className="number-input"
-                min="0"
-              />
-              <span className="score-separator">-</span>
-              <input
-                type="number"
-                value={predictions.finalScoreTeam2}
-                onChange={(e) => handleChange('finalScoreTeam2', e.target.value)}
-                placeholder={teamNames.team2}
-                className="number-input"
-                min="0"
-              />
-            </div>
-          </div>
+            // Special handling for Beer Brand (Custom options)
+            if (cat.key === 'beerBrand') {
+              return (
+                <div key={cat.key} className="form-group">
+                  <label>{cat.label}</label>
+                  <div className="radio-group">
+                    {['Bud Light', 'Michelob Ultra', 'Coors', 'Other'].map(brand => (
+                      <label key={brand} className="radio-label">
+                        <input
+                          type="radio"
+                          name={cat.key}
+                          value={brand}
+                          checked={predictions[cat.key] === brand}
+                          onChange={(e) => handleChange(cat.key, e.target.value)}
+                        />
+                        {brand}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
 
-          <div className="form-group">
-            <label>Will the game go to overtime?</label>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="overtime"
-                  value="Yes"
-                  checked={predictions.overtime === 'Yes'}
-                  onChange={(e) => handleChange('overtime', e.target.value)}
-                />
-                Yes
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="overtime"
-                  value="No"
-                  checked={predictions.overtime === 'No'}
-                  onChange={(e) => handleChange('overtime', e.target.value)}
-                />
-                No
-              </label>
-            </div>
-          </div>
+            // Standard renderers based on type
+            return (
+              <div key={cat.key} className="form-group">
+                <label htmlFor={cat.key}>{cat.label}</label>
 
-          <div className="form-group">
-            <label htmlFor="totalPoints">Total points scored</label>
-            <input
-              id="totalPoints"
-              type="number"
-              value={predictions.totalPoints}
-              onChange={(e) => handleChange('totalPoints', e.target.value)}
-              placeholder="e.g., 48"
-              className="number-input"
-              min="0"
-            />
-          </div>
-        </div>
+                {cat.type === 'text' && (
+                  <input
+                    id={cat.key}
+                    type="text"
+                    value={predictions[cat.key] || ''}
+                    onChange={(e) => handleChange(cat.key, e.target.value)}
+                    placeholder={`Enter ${cat.label.toLowerCase()}`}
+                    className="text-input"
+                  />
+                )}
 
-        {/* Commercial Predictions */}
-        <div className="form-section">
-          <h3>📺 Commercial Predictions</h3>
+                {cat.type === 'number' && (
+                  <input
+                    id={cat.key}
+                    type="number"
+                    value={predictions[cat.key] || ''}
+                    onChange={(e) => handleChange(cat.key, e.target.value)}
+                    placeholder="e.g., 0"
+                    className="number-input"
+                    min="0"
+                  />
+                )}
 
-          <div className="form-group">
-            <label htmlFor="carCommercials">How many car commercials?</label>
-            <input
-              id="carCommercials"
-              type="number"
-              value={predictions.carCommercials}
-              onChange={(e) => handleChange('carCommercials', e.target.value)}
-              placeholder="e.g., 12"
-              className="number-input"
-              min="0"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Which beer brand will have the most ads?</label>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="beerBrand"
-                  value="Bud Light"
-                  checked={predictions.beerBrand === 'Bud Light'}
-                  onChange={(e) => handleChange('beerBrand', e.target.value)}
-                />
-                Bud Light
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="beerBrand"
-                  value="Michelob Ultra"
-                  checked={predictions.beerBrand === 'Michelob Ultra'}
-                  onChange={(e) => handleChange('beerBrand', e.target.value)}
-                />
-                Michelob Ultra
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="beerBrand"
-                  value="Coors"
-                  checked={predictions.beerBrand === 'Coors'}
-                  onChange={(e) => handleChange('beerBrand', e.target.value)}
-                />
-                Coors
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="beerBrand"
-                  value="Other"
-                  checked={predictions.beerBrand === 'Other'}
-                  onChange={(e) => handleChange('beerBrand', e.target.value)}
-                />
-                Other
-              </label>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Will there be a crypto ad?</label>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="cryptoAd"
-                  value="Yes"
-                  checked={predictions.cryptoAd === 'Yes'}
-                  onChange={(e) => handleChange('cryptoAd', e.target.value)}
-                />
-                Yes
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="cryptoAd"
-                  value="No"
-                  checked={predictions.cryptoAd === 'No'}
-                  onChange={(e) => handleChange('cryptoAd', e.target.value)}
-                />
-                No
-              </label>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="bestCommercial">Best commercial (fill in after watching)</label>
-            <input
-              id="bestCommercial"
-              type="text"
-              value={predictions.bestCommercial}
-              onChange={(e) => handleChange('bestCommercial', e.target.value)}
-              placeholder="Brand or product name"
-              className="text-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="weirdestCommercial">Weirdest commercial (fill in after watching)</label>
-            <input
-              id="weirdestCommercial"
-              type="text"
-              value={predictions.weirdestCommercial}
-              onChange={(e) => handleChange('weirdestCommercial', e.target.value)}
-              placeholder="Brand or product name"
-              className="text-input"
-            />
-          </div>
-        </div>
-
-        {/* Halftime Show */}
-        <div className="form-section">
-          <h3>🎤 Halftime Show Predictions</h3>
-
-          <div className="form-group">
-            <label htmlFor="openingSong">Opening song</label>
-            <input
-              id="openingSong"
-              type="text"
-              value={predictions.openingSong}
-              onChange={(e) => handleChange('openingSong', e.target.value)}
-              placeholder="Song title"
-              className="text-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="closingSong">Closing song</label>
-            <input
-              id="closingSong"
-              type="text"
-              value={predictions.closingSong}
-              onChange={(e) => handleChange('closingSong', e.target.value)}
-              placeholder="Song title"
-              className="text-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="totalSongs">Total number of songs</label>
-            <input
-              id="totalSongs"
-              type="number"
-              value={predictions.totalSongs}
-              onChange={(e) => handleChange('totalSongs', e.target.value)}
-              placeholder="e.g., 8"
-              className="number-input"
-              min="0"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="specialGuest">Special guest? Who?</label>
-            <input
-              id="specialGuest"
-              type="text"
-              value={predictions.specialGuest}
-              onChange={(e) => handleChange('specialGuest', e.target.value)}
-              placeholder="Guest name or 'None'"
-              className="text-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="costumeChanges">Number of costume changes</label>
-            <input
-              id="costumeChanges"
-              type="number"
-              value={predictions.costumeChanges}
-              onChange={(e) => handleChange('costumeChanges', e.target.value)}
-              placeholder="e.g., 3"
-              className="number-input"
-              min="0"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Will they play their biggest hit?</label>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="playBiggestHit"
-                  value="Yes"
-                  checked={predictions.playBiggestHit === 'Yes'}
-                  onChange={(e) => handleChange('playBiggestHit', e.target.value)}
-                />
-                Yes
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="playBiggestHit"
-                  value="No"
-                  checked={predictions.playBiggestHit === 'No'}
-                  onChange={(e) => handleChange('playBiggestHit', e.target.value)}
-                />
-                No
-              </label>
-            </div>
-          </div>
+                {cat.type === 'radio' && (
+                  <div className="radio-group">
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        name={cat.key}
+                        value="Yes"
+                        checked={predictions[cat.key] === 'Yes'}
+                        onChange={(e) => handleChange(cat.key, e.target.value)}
+                      />
+                      Yes
+                    </label>
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        name={cat.key}
+                        value="No"
+                        checked={predictions[cat.key] === 'No'}
+                        onChange={(e) => handleChange(cat.key, e.target.value)}
+                      />
+                      No
+                    </label>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <div className="form-actions">

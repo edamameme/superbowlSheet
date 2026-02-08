@@ -14,6 +14,9 @@ const AdminView = ({
   onAddCategory,
   onRemoveCategory,
   onUpdateCategoryPoints,
+  onUpdateCategoryLabel,
+  onUpdateCategoryType,
+  onMoveCategory,
   onUpdatePrediction,
   predictionsLocked,
   onToggleLock,
@@ -229,8 +232,28 @@ const AdminView = ({
               <tbody>
                 {categories.map((cat) => (
                   <tr key={cat.key}>
-                    <td>{cat.label}</td>
-                    <td>{cat.type}</td>
+                    <td>
+                      <input
+                        type="text"
+                        value={cat.label}
+                        onChange={(e) => onUpdateCategoryLabel(cat.key, e.target.value)}
+                        className="text-input"
+                      />
+                    </td>
+                    <td>
+                      <select
+                        value={cat.type}
+                        onChange={(e) => onUpdateCategoryType(cat.key, e.target.value)}
+                        className="select-input"
+                        disabled={cat.key === 'finalScore'} // Prevent changing special types
+                      >
+                        <option value="text">Text</option>
+                        <option value="number">Number</option>
+                        <option value="radio">Yes/No</option>
+                        <option value="team">Team Select</option>
+                        {cat.type === 'score' && <option value="score">Score</option>}
+                      </select>
+                    </td>
                     <td>
                       <input
                         type="number"
@@ -241,12 +264,30 @@ const AdminView = ({
                       />
                     </td>
                     <td>
-                      <button
-                        onClick={() => onRemoveCategory(cat.key)}
-                        className="remove-button"
-                      >
-                        Remove
-                      </button>
+                      <div className="action-buttons">
+                        <button
+                          onClick={() => onMoveCategory(cat.key, 'up')}
+                          className="icon-button"
+                          title="Move Up"
+                          disabled={categories.indexOf(cat) === 0}
+                        >
+                          ⬆️
+                        </button>
+                        <button
+                          onClick={() => onMoveCategory(cat.key, 'down')}
+                          className="icon-button"
+                          title="Move Down"
+                          disabled={categories.indexOf(cat) === categories.length - 1}
+                        >
+                          ⬇️
+                        </button>
+                        <button
+                          onClick={() => onRemoveCategory(cat.key)}
+                          className="remove-button"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -278,6 +319,7 @@ const AdminView = ({
                   <option value="text">Text</option>
                   <option value="number">Number</option>
                   <option value="radio">Yes/No</option>
+                  <option value="team">Team Select</option>
                 </select>
                 <input
                   type="number"

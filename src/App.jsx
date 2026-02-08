@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Routes, Route, useNavigate, useLocation, Link } from 'react-router-dom';
 import './App.css';
 import PredictionForm from './components/PredictionForm';
 import AdminView from './components/AdminView';
@@ -8,7 +9,9 @@ import { subscribeToState, saveState } from './firebase';
 
 const DEFAULT_CATEGORIES = [
   { key: 'firstTDTime', label: 'First TD Time', type: 'text', pointValue: 10 },
-  { key: 'firstScoreTeam', label: 'First Score Team', type: 'radio', pointValue: 5 },
+  { key: 'firstTDTime', label: 'First TD Time', type: 'text', pointValue: 10 },
+  { key: 'firstScoreTeam', label: 'First Score Team', type: 'team', pointValue: 5 },
+  { key: 'finalScore', label: 'Final Score', type: 'score', pointValue: 10 },
   { key: 'finalScore', label: 'Final Score', type: 'score', pointValue: 10 },
   { key: 'overtime', label: 'Overtime?', type: 'radio', pointValue: 5 },
   { key: 'totalPoints', label: 'Total Points', type: 'number', pointValue: 10 },
@@ -26,7 +29,8 @@ const DEFAULT_CATEGORIES = [
 ];
 
 function App() {
-  const [view, setView] = useState('home');
+  const navigate = useNavigate();
+  const location = useLocation();
   const [predictions, setPredictions] = useState([]);
   const [scores, setScores] = useState({});
   const [currentPlayer, setCurrentPlayer] = useState(null);
@@ -131,7 +135,7 @@ function App() {
       [playerName]: prev[playerName] || 0
     }));
 
-    setView('home');
+    navigate('/');
   };
 
   const updateScore = (playerName, points) => {
@@ -148,7 +152,7 @@ function App() {
 
       setPredictions([]);
       setScores({});
-      setView('home');
+      navigate('/');
     }
   };
 
@@ -178,6 +182,33 @@ function App() {
     ));
   };
 
+  const updateCategoryLabel = (key, newLabel) => {
+    setCategories(prev => prev.map(cat =>
+      cat.key === key ? { ...cat, label: newLabel } : cat
+    ));
+  };
+
+  const updateCategoryType = (key, newType) => {
+    setCategories(prev => prev.map(cat =>
+      cat.key === key ? { ...cat, type: newType } : cat
+    ));
+  };
+
+  const moveCategory = (key, direction) => {
+    setCategories(prev => {
+      const index = prev.findIndex(cat => cat.key === key);
+      if (index === -1) return prev;
+
+      const newCategories = [...prev];
+      if (direction === 'up' && index > 0) {
+        [newCategories[index - 1], newCategories[index]] = [newCategories[index], newCategories[index - 1]];
+      } else if (direction === 'down' && index < newCategories.length - 1) {
+        [newCategories[index + 1], newCategories[index]] = [newCategories[index], newCategories[index + 1]];
+      }
+      return newCategories;
+    });
+  };
+
   const updatePrediction = (playerName, predictionData) => {
     setPredictions(prev => prev.map(p =>
       p.playerName === playerName ? { ...p, ...predictionData } : p
@@ -186,7 +217,7 @@ function App() {
 
   const viewMyPredictions = (playerName) => {
     setCurrentPlayer(playerName);
-    setView('myPredictions');
+    navigate('/my-predictions');
   };
 
   const togglePredictionsLock = () => {
@@ -211,20 +242,20 @@ function App() {
       <header className="app-header">
         <h1>🏈 Super Bowl Prediction Party 🏈</h1>
         <nav className="nav-buttons">
-          {view !== 'home' && (
-            <button onClick={() => setView('home')} className="nav-button">
+          {location.pathname !== '/' && (
+            <button onClick={() => navigate('/')} className="nav-button">
               Home
             </button>
           )}
           {predictions.length > 0 && (
             <>
-              <button onClick={() => setView('myPredictions')} className="nav-button">
+              <button onClick={() => navigate('/my-predictions')} className="nav-button">
                 My Predictions
               </button>
-              <button onClick={() => setView('admin')} className="nav-button desktop-only">
+              <button onClick={() => navigate('/admin')} className="nav-button desktop-only">
                 Admin View
               </button>
-              <button onClick={() => setView('leaderboard')} className="nav-button">
+              <button onClick={() => navigate('/leaderboard')} className="nav-button">
                 Leaderboard
               </button>
             </>
@@ -233,93 +264,98 @@ function App() {
       </header>
 
       <main className="app-main">
-        {view === 'home' && (
-          <div className="home-view">
-            <h2>Welcome to the Super Bowl Prediction Party!</h2>
-            <p>Enter your predictions and compete with your friends!</p>
+        <Routes>
+          <Route path="/" element={
+            <div className="home-view">
+              <h2>Welcome to the Super Bowl Prediction Party!</h2>
+              <p>Enter your predictions and compete with your friends!</p>
 
-            <div className="players-status">
-              <h3>Players ({predictions.length})</h3>
-              {predictions.length > 0 ? (
-                <ul className="players-list">
-                  {predictions.map(p => (
-                    <li key={p.id} className="player-item">
-                      <span className="player-name">{p.playerName}</span>
-                      <img
-                        src={`${import.meta.env.BASE_URL}${p.selectedTeam === 'patriots' ? 'patriots-logo.svg' : 'seahawks-logo.svg'}`}
-                        alt={p.selectedTeam === 'patriots' ? 'Patriots' : 'Seahawks'}
-                        className="player-team-logo"
-                      />
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No predictions yet. Be the first!</p>
-              )}
+              <div className="players-status">
+                <h3>Players ({predictions.length})</h3>
+                {predictions.length > 0 ? (
+                  <ul className="players-list">
+                    {predictions.map(p => (
+                      <li key={p.id} className="player-item">
+                        <span className="player-name">{p.playerName}</span>
+                        <img
+                          src={`${import.meta.env.BASE_URL}${p.selectedTeam === 'patriots' ? 'patriots-logo.svg' : 'seahawks-logo.svg'}`}
+                          alt={p.selectedTeam === 'patriots' ? 'Patriots' : 'Seahawks'}
+                          className="player-team-logo"
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No predictions yet. Be the first!</p>
+                )}
+              </div>
+
+              <button
+                onClick={() => navigate('/form')}
+                className="primary-button"
+              >
+                Enter Your Predictions
+              </button>
             </div>
+          } />
 
-            <button
-              onClick={() => setView('form')}
-              className="primary-button"
-            >
-              Enter Your Predictions
-            </button>
-          </div>
-        )}
+          <Route path="/form" element={
+            <PredictionForm
+              onSubmit={addPrediction}
+              existingPlayers={predictions.map(p => p.playerName)}
+              onCancel={() => navigate('/')}
+              teamNames={teamNames}
+              categories={categories}
+              theme={theme}
+              onUpdateTheme={updateTheme}
+            />
+          } />
 
-        {view === 'form' && (
-          <PredictionForm
-            onSubmit={addPrediction}
-            existingPlayers={predictions.map(p => p.playerName)}
-            onCancel={() => setView('home')}
-            teamNames={teamNames}
-            categories={categories}
-            theme={theme}
-            onUpdateTheme={updateTheme}
-          />
-        )}
+          <Route path="/my-predictions" element={
+            <MyPredictions
+              predictions={predictions}
+              scores={scores}
+              categories={categories}
+              onSelectPlayer={setCurrentPlayer}
+              currentPlayer={currentPlayer}
+              onUpdatePrediction={updatePrediction}
+              predictionsLocked={predictionsLocked}
+              theme={theme}
+              onUpdateTheme={updateTheme}
+            />
+          } />
 
-        {view === 'myPredictions' && (
-          <MyPredictions
-            predictions={predictions}
-            scores={scores}
-            categories={categories}
-            onSelectPlayer={setCurrentPlayer}
-            currentPlayer={currentPlayer}
-            onUpdatePrediction={updatePrediction}
-            predictionsLocked={predictionsLocked}
-            theme={theme}
-            onUpdateTheme={updateTheme}
-          />
-        )}
+          <Route path="/admin" element={
+            <AdminView
+              predictions={predictions}
+              scores={scores}
+              onUpdateScore={updateScore}
+              teamNames={teamNames}
+              onUpdateTeamNames={updateTeamNames}
+              theme={theme}
+              onUpdateTheme={updateTheme}
+              categories={categories}
+              onUpdateCategories={updateCategories}
+              onAddCategory={addCategory}
+              onRemoveCategory={removeCategory}
+              onUpdateCategoryPoints={updateCategoryPoints}
+              onUpdateCategoryLabel={updateCategoryLabel}
+              onUpdateCategoryType={updateCategoryType}
+              onMoveCategory={moveCategory}
+              onUpdatePrediction={updatePrediction}
+              predictionsLocked={predictionsLocked}
+              onToggleLock={togglePredictionsLock}
+              onResetAll={resetAll}
+            />
+          } />
 
-        {view === 'admin' && (
-          <AdminView
-            predictions={predictions}
-            scores={scores}
-            onUpdateScore={updateScore}
-            teamNames={teamNames}
-            onUpdateTeamNames={updateTeamNames}
-            theme={theme}
-            onUpdateTheme={updateTheme}
-            categories={categories}
-            onUpdateCategories={updateCategories}
-            onAddCategory={addCategory}
-            onRemoveCategory={removeCategory}
-            onUpdateCategoryPoints={updateCategoryPoints}
-            onUpdatePrediction={updatePrediction}
-            predictionsLocked={predictionsLocked}
-            onToggleLock={togglePredictionsLock}
-            onResetAll={resetAll}
-          />
-        )}
-
-        {view === 'leaderboard' && (
-          <Leaderboard
-            predictions={predictions}
-            scores={scores}
-          />
-        )}
+          <Route path="/leaderboard" element={
+            <Leaderboard
+              predictions={predictions}
+              scores={scores}
+            />
+          } />
+        </Routes>
       </main>
     </div>
   );
