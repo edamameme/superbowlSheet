@@ -163,8 +163,17 @@ body {
 }
 
 @media (max-width: 768px) {
-  .app-header h1 { font-size: 1.8rem; }
-  .app-main { padding: 20px; }
+  .app-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .app-main {
+    padding: 20px;
+  }
+
+  .desktop-only {
+    display: none;
+  }
 }
 
 /* Seahawks Theme */

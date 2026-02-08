@@ -218,7 +218,7 @@ function App() {
               <button onClick={() => setView('myPredictions')} className="nav-button">
                 My Predictions
               </button>
-              <button onClick={() => setView('admin')} className="nav-button">
+              <button onClick={() => setView('admin')} className="nav-button desktop-only">
                 Admin View
               </button>
               <button onClick={() => setView('leaderboard')} className="nav-button">
