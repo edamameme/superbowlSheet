@@ -1,0 +1,173 @@
+/* Whiteboard.css */
+.whiteboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.whiteboard-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.whiteboard-header h2 {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+/* Input Section */
+.whiteboard-input-section {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.note-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.note-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.text-input {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.post-button {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-red));
+    color: var(--white);
+    border: 2px solid var(--white);
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.post-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+    filter: brightness(1.1);
+}
+
+
+
+/* Notes Grid */
+.notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 20px;
+}
+
+.sticky-note {
+    background-color: #ffd700;
+    /* Default yellow */
+    padding: 20px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    transform: rotate(-2deg);
+    transition: transform 0.3s;
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sticky-note:hover {
+    transform: scale(1.05) rotate(0deg);
+    z-index: 10;
+}
+
+.sticky-note:nth-child(2n) {
+    transform: rotate(2deg);
+}
+
+.sticky-note:nth-child(3n) {
+    transform: rotate(-1deg);
+}
+
+/* Themed Colors */
+.seahawks-note {
+    background-color: #e6f4ff;
+    /* Light blue */
+    border-top: 4px solid #69BE28;
+    /* Action Green */
+    color: #002244;
+}
+
+.patriots-note {
+    background-color: #fff0f0;
+    /* Light red */
+    border-top: 4px solid #002244;
+    /* Navy */
+    color: #C60C30;
+}
+
+.note-content {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    margin-bottom: 15px;
+    word-wrap: break-word;
+}
+
+.note-footer {
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px dashed rgba(0, 0, 0, 0.1);
+    padding-top: 10px;
+}
+
+.note-author {
+    font-weight: bold;
+}
+
+.pin {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.empty-board {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #888;
+    padding: 40px;
+    font-size: 1.2rem;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+}
+
+/* Local dark mode override for notes to keep them looking like paper */
+[data-theme='seahawks'] .sticky-note,
+[data-theme='patriots'] .sticky-note {
+    color: #333;
+    /* Always dark text on paper */
+}

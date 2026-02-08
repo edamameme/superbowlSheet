@@ -20,7 +20,9 @@ const AdminView = ({
   onUpdatePrediction,
   predictionsLocked,
   onToggleLock,
-  onResetAll
+  onResetAll,
+  notes = [],
+  onDeleteNote
 }) => {
   const [showPrintView, setShowPrintView] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -415,6 +417,47 @@ const AdminView = ({
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="admin-section">
+        <h3>📝 Whiteboard Management</h3>
+        <div className="notes-management">
+          {Array.isArray(notes) && notes.length > 0 ? (
+            <table className="notes-table">
+              <thead>
+                <tr>
+                  <th>Author</th>
+                  <th>Note</th>
+                  <th>Time</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {notes.map(note => (
+                  <tr key={note.id}>
+                    <td>{note.author}</td>
+                    <td>{note.text}</td>
+                    <td>{new Date(note.timestamp).toLocaleTimeString()}</td>
+                    <td>
+                      <button
+                        onClick={() => {
+                          if (window.confirm('Delete this note?')) {
+                            onDeleteNote(note.id);
+                          }
+                        }}
+                        className="delete-button-small"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>No notes to manage.</p>
+          )}
+        </div>
       </div>
 
       <div className="desktop-only-notice">

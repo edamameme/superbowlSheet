@@ -5,13 +5,12 @@ import PredictionForm from './components/PredictionForm';
 import AdminView from './components/AdminView';
 import Leaderboard from './components/Leaderboard';
 import MyPredictions from './components/MyPredictions';
+import Whiteboard from './components/Whiteboard';
 import { subscribeToState, saveState } from './firebase';
 
 const DEFAULT_CATEGORIES = [
   { key: 'firstTDTime', label: 'First TD Time', type: 'text', pointValue: 10 },
-  { key: 'firstTDTime', label: 'First TD Time', type: 'text', pointValue: 10 },
   { key: 'firstScoreTeam', label: 'First Score Team', type: 'team', pointValue: 5 },
-  { key: 'finalScore', label: 'Final Score', type: 'score', pointValue: 10 },
   { key: 'finalScore', label: 'Final Score', type: 'score', pointValue: 10 },
   { key: 'overtime', label: 'Overtime?', type: 'radio', pointValue: 5 },
   { key: 'totalPoints', label: 'Total Points', type: 'number', pointValue: 10 },
@@ -33,6 +32,7 @@ function App() {
   const location = useLocation();
   const [predictions, setPredictions] = useState([]);
   const [scores, setScores] = useState({});
+  const [notes, setNotes] = useState([]);
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [predictionsLocked, setPredictionsLocked] = useState(false);
   const [teamNames, setTeamNames] = useState({ team1: 'Seattle Seahawks', team2: 'New England Patriots' });
@@ -50,8 +50,8 @@ function App() {
     if (syncTimeout.current) clearTimeout(syncTimeout.current);
     syncTimeout.current = setTimeout(async () => {
       // Merge local predictions with remote to avoid overwrites
-      const remotePredictions = lastRemoteData.current?.predictions || [];
-      const localPredictions = state.predictions || [];
+      const remotePredictions = Array.isArray(lastRemoteData.current?.predictions) ? lastRemoteData.current.predictions : [];
+      const localPredictions = Array.isArray(state.predictions) ? state.predictions : [];
 
       // Create a map of all predictions, local ones take priority for same player
       const predictionMap = new Map();
@@ -61,10 +61,19 @@ function App() {
       const mergedPredictions = Array.from(predictionMap.values());
 
       // Merge scores similarly
+      const remoteScores = (lastRemoteData.current?.scores && typeof lastRemoteData.current.scores === 'object') ? lastRemoteData.current.scores : {};
+      const localScores = (state.scores && typeof state.scores === 'object') ? state.scores : {};
+
       const mergedScores = {
-        ...(lastRemoteData.current?.scores || {}),
-        ...(state.scores || {})
+        ...remoteScores,
+        ...localScores
       };
+
+      // Merge notes (concat and dedupe by ID)
+      const remoteNotes = Array.isArray(lastRemoteData.current?.notes) ? lastRemoteData.current.notes : [];
+      const localNotes = Array.isArray(state.notes) ? state.notes : [];
+      const allNotes = [...remoteNotes, ...localNotes];
+      const uniqueNotes = Array.from(new Map(allNotes.map(note => [note.id, note])).values());
 
       // Exclude theme from sync
       const { theme, ...stateToSync } = state;
@@ -73,6 +82,7 @@ function App() {
         ...stateToSync,
         predictions: mergedPredictions,
         scores: mergedScores,
+        notes: uniqueNotes
       });
     }, 300);
   }, []);
@@ -82,11 +92,12 @@ function App() {
     const unsubscribe = subscribeToState((data) => {
       isRemoteUpdate.current = true;
       lastRemoteData.current = data; // Store remote data for merging
-      if (data.predictions) setPredictions(data.predictions);
-      if (data.scores) setScores(data.scores);
-      if (data.teamNames) setTeamNames(data.teamNames);
+      if (Array.isArray(data.predictions)) setPredictions(data.predictions);
+      if (data.scores && typeof data.scores === 'object') setScores(data.scores);
+      if (Array.isArray(data.notes)) setNotes(data.notes);
+      if (data.teamNames && typeof data.teamNames === 'object') setTeamNames(data.teamNames);
       // Theme is now local-only, ignore remote theme
-      if (data.categories) setCategories(data.categories);
+      if (Array.isArray(data.categories)) setCategories(data.categories);
       if (data.predictionsLocked !== undefined) setPredictionsLocked(data.predictionsLocked);
       setLoaded(true);
       // Reset flag after React processes the state updates
@@ -112,14 +123,33 @@ function App() {
       theme,
       predictionsLocked,
       categories,
+      notes,
     });
-  }, [predictions, scores, teamNames, theme, predictionsLocked, categories, loaded, syncToFirestore]);
+  }, [predictions, scores, teamNames, theme, predictionsLocked, categories, notes, loaded, syncToFirestore]);
+
+  const [localPlayerName, setLocalPlayerName] = useState(() => localStorage.getItem('superbowl-player') || null);
+
+  // ... (rest of state definitions)
+
+  // ... (existing effects)
+
+  // Sync all state changes to Firestore
+  useEffect(() => {
+    // ... (existing sync effect)
+  }, [predictions, scores, teamNames, theme, predictionsLocked, categories, notes, loaded, syncToFirestore]);
 
   // Apply theme to document
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('superbowl-theme', theme);
   }, [theme]);
+
+  // Handle local player name changes
+  useEffect(() => {
+    if (localPlayerName) {
+      localStorage.setItem('superbowl-player', localPlayerName);
+    }
+  }, [localPlayerName]);
 
   const addPrediction = (playerName, predictionData) => {
     const newPrediction = {
@@ -139,6 +169,7 @@ function App() {
       [playerName]: prev[playerName] || 0
     }));
 
+    setLocalPlayerName(playerName);
     navigate('/');
   };
 
@@ -147,6 +178,25 @@ function App() {
       ...prev,
       [playerName]: (prev[playerName] || 0) + points
     }));
+  };
+
+  const addNote = (note) => {
+    const newNote = {
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      ...note
+    };
+    setNotes(prev => [...prev, newNote]);
+  };
+
+  const updateNote = (id, updatedFields) => {
+    setNotes(prev => prev.map(note =>
+      note.id === id ? { ...note, ...updatedFields } : note
+    ));
+  };
+
+  const deleteNote = (id) => {
+    setNotes(prev => prev.filter(note => note.id !== id));
   };
 
   const resetAll = () => {
@@ -264,6 +314,9 @@ function App() {
               </button>
             </>
           )}
+          <button onClick={() => navigate('/whiteboard')} className="nav-button">
+            Whiteboard
+          </button>
         </nav>
       </header>
 
@@ -294,12 +347,33 @@ function App() {
                 )}
               </div>
 
-              <button
-                onClick={() => navigate('/form')}
-                className="primary-button"
-              >
-                Enter Your Predictions
-              </button>
+              {localPlayerName ? (
+                <div className="welcome-back">
+                  <h3>Welcome back, {localPlayerName}!</h3>
+                  <p>You have already submitted your predictions.</p>
+                  <button
+                    onClick={() => viewMyPredictions(localPlayerName)}
+                    className="primary-button"
+                  >
+                    View My Predictions
+                  </button>
+                  <div className="player-identity-footer">
+                    <small>Not {localPlayerName}? <button className="link-button" onClick={() => {
+                      if (window.confirm('Reset identity? This will verify you are a new user.')) {
+                        setLocalPlayerName(null);
+                        localStorage.removeItem('superbowl-player');
+                      }
+                    }}>Switch User</button></small>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => navigate('/form')}
+                  className="primary-button"
+                >
+                  Enter Your Predictions
+                </button>
+              )}
             </div>
           } />
 
@@ -350,6 +424,8 @@ function App() {
               predictionsLocked={predictionsLocked}
               onToggleLock={togglePredictionsLock}
               onResetAll={resetAll}
+              notes={notes}
+              onDeleteNote={deleteNote}
             />
           } />
 
@@ -357,6 +433,16 @@ function App() {
             <Leaderboard
               predictions={predictions}
               scores={scores}
+            />
+          } />
+
+          <Route path="/whiteboard" element={
+            <Whiteboard
+              notes={notes}
+              onAddNote={addNote}
+              onUpdateNote={updateNote}
+              theme={theme}
+              defaultAuthor={localPlayerName}
             />
           } />
         </Routes>
