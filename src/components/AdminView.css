@@ -1,0 +1,435 @@
+.admin-view {
+  padding: 20px 0;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.admin-header h2 {
+  color: var(--primary-blue);
+}
+
+.print-button {
+  padding: 10px 20px;
+  background: var(--primary-red);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.scoring-guide {
+  background: var(--light-gray);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.predictions-table-container {
+  overflow-x: auto;
+  margin-bottom: 30px;
+}
+
+.predictions-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  min-width: 800px;
+}
+
+.predictions-table th, .predictions-table td {
+  padding: 15px;
+  text-align: left;
+  border: 1px solid var(--gray);
+}
+
+.predictions-table thead {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-red));
+  color: var(--white);
+}
+
+.player-score {
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.prediction-cell {
+  text-align: center;
+}
+
+.prediction-value {
+  margin-bottom: 10px;
+  padding: 8px;
+  background: var(--light-gray);
+  border-radius: 5px;
+}
+
+.point-buttons {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.point-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  color: var(--white);
+}
+
+.small-points { background: var(--primary-blue); }
+.big-points { background: var(--primary-red); }
+.huge-points { background: var(--gold); color: var(--text-dark); }
+
+.manual-scoring {
+  background: var(--light-gray);
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 30px;
+}
+
+.manual-score-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: var(--white);
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.adjust-button {
+  padding: 5px 12px;
+  background: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.print-view {
+  padding: 20px;
+}
+
+.print-content h2 {
+  margin-bottom: 30px;
+}
+
+.player-predictions-print {
+  margin-bottom: 40px;
+}
+
+.predictions-grid-print {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.prediction-item-print {
+  padding: 10px;
+  background: var(--light-gray);
+  border-radius: 5px;
+}
+
+/* Settings View */
+.settings-view {
+  padding: 20px;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.settings-header h2 {
+  color: var(--primary-blue);
+}
+
+.settings-section {
+  background: var(--light-gray);
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 30px;
+  border-left: 5px solid var(--primary-blue);
+}
+
+.settings-section h3 {
+  color: var(--primary-red);
+  margin-bottom: 20px;
+}
+
+.team-names-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.save-button {
+  padding: 12px 30px;
+  background: var(--success);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.save-button:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}
+
+/* Theme Selector */
+.theme-selector {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.theme-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  border: 3px solid var(--gray);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--white);
+}
+
+.theme-option:hover {
+  border-color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+.theme-option.active {
+  border-color: var(--primary-blue);
+  background: rgba(0, 68, 204, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 68, 204, 0.3);
+}
+
+.theme-preview {
+  width: 100px;
+  height: 60px;
+  border-radius: 8px;
+  display: flex;
+}
+
+.default-theme {
+  background: linear-gradient(135deg, #0044cc 0%, #cc0000 100%);
+}
+
+.seahawks-theme {
+  background: linear-gradient(135deg, #002244 0%, #69BE28 100%);
+}
+
+.patriots-theme {
+  background: linear-gradient(135deg, #002244 0%, #C60C30 100%);
+}
+
+/* Categories Manager */
+.categories-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.categories-table {
+  width: 100%;
+  background: var(--white);
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.categories-table th,
+.categories-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--gray);
+}
+
+.categories-table th {
+  background: var(--primary-blue);
+  color: var(--white);
+  font-weight: bold;
+}
+
+.points-input {
+  width: 80px;
+  padding: 6px;
+  border: 2px solid var(--gray);
+  border-radius: 5px;
+}
+
+.remove-button {
+  padding: 6px 15px;
+  background: var(--danger);
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.remove-button:hover {
+  background: var(--dark-red);
+}
+
+/* Add Category Form */
+.add-category-form {
+  background: var(--white);
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px dashed var(--gray);
+}
+
+.add-category-form h4 {
+  margin-bottom: 15px;
+  color: var(--primary-blue);
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.select-input {
+  padding: 12px;
+  border: 2px solid var(--gray);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.add-button {
+  padding: 12px 25px;
+  background: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.add-button:hover {
+  background: var(--dark-blue);
+}
+
+/* Header buttons */
+.header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.settings-button {
+  padding: 10px 20px;
+  background: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.settings-button:hover {
+  background: var(--dark-blue);
+}
+
+.current-settings {
+  display: flex;
+  gap: 20px;
+  padding: 15px;
+  background: var(--light-gray);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.point-badge {
+  font-size: 0.85rem;
+  color: var(--primary-red);
+  font-weight: bold;
+}
+
+.award-points {
+  background: var(--success) !important;
+}
+
+.award-points:hover {
+  background: #218838 !important;
+}
+
+@media (max-width: 768px) {
+  .theme-selector {
+    flex-direction: column;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .header-buttons {
+    flex-direction: column;
+  }
+}
+
+/* Desktop Only Notice */
+.desktop-only-notice {
+  display: none;
+  background: var(--light-gray);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.desktop-only-notice p {
+  color: var(--dark-gray);
+  font-size: 1.1rem;
+}
+
+/* Hide admin view on mobile/tablet */
+@media (max-width: 1024px) {
+  .admin-view {
+    display: none !important;
+  }
+
+  .settings-view {
+    display: none !important;
+  }
+
+  .print-view {
+    display: none !important;
+  }
+
+  .desktop-only-notice {
+    display: block !important;
+  }
+
+  /* Show warning instead of admin content */
+  .admin-view::before,
+  .settings-view::before {
+    content: "💻 Admin View requires a desktop or larger screen";
+    display: block;
+    padding: 40px;
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--dark-gray);
+    background: var(--light-gray);
+    border-radius: 10px;
+  }
+}

@@ -1,0 +1,187 @@
+.prediction-form-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.prediction-form-container h2 {
+  color: var(--primary-blue);
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.prediction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.form-section {
+  background: var(--light-gray);
+  border-radius: 10px;
+  padding: 25px;
+  border-left: 5px solid var(--primary-blue);
+}
+
+.form-section h3 {
+  color: var(--primary-red);
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.text-input, .number-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--gray);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.text-input:focus, .number-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+}
+
+.number-input {
+  width: 150px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  background: var(--white);
+  border: 2px solid var(--gray);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.radio-label:hover {
+  border-color: var(--primary-blue);
+}
+
+.radio-label:has(input:checked) {
+  border-color: var(--primary-blue);
+  background: rgba(0, 68, 204, 0.1);
+  font-weight: bold;
+}
+
+.score-inputs {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+.submit-button, .cancel-button {
+  padding: 15px 40px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.submit-button {
+  background: linear-gradient(135deg, var(--primary-blue), var(--primary-red));
+  color: var(--white);
+}
+
+.cancel-button {
+  background: var(--gray);
+  color: var(--text-dark);
+}
+
+@media (max-width: 768px) {
+  .form-section { padding: 15px; }
+  .radio-group { flex-direction: column; }
+  .number-input { width: 100%; }
+}
+
+/* Theme Selector in Form */
+.theme-section {
+  border-left-color: var(--gold) !important;
+}
+
+.theme-selector-form {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.theme-option-small {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 3px solid var(--gray);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--white);
+  flex: 1;
+  min-width: 100px;
+}
+
+.theme-option-small:hover {
+  border-color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+.theme-option-small.active {
+  border-color: var(--primary-blue);
+  background: rgba(0, 68, 204, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 68, 204, 0.3);
+}
+
+.theme-preview-small {
+  width: 80px;
+  height: 50px;
+  border-radius: 6px;
+  display: flex;
+}
+
+.theme-option-small span {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .theme-selector-form {
+    flex-direction: column;
+  }
+
+  .theme-option-small {
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .theme-preview-small {
+    width: 60px;
+    height: 40px;
+  }
+}
