@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc, onSnapshot } from "firebase/firestore";
+import { getFirestore, doc, setDoc, onSnapshot, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCpd7nkEJQ_t_kbrBCkC03xiK_U66u7QPI",
@@ -16,15 +16,29 @@ const db = getFirestore(app);
 const STATE_DOC = doc(db, "app", "state");
 
 export function subscribeToState(callback) {
+  console.log('Subscribing to Firestore document:', STATE_DOC.path);
   return onSnapshot(STATE_DOC, (snapshot) => {
+    console.log('Firestore snapshot received, exists:', snapshot.exists());
     if (snapshot.exists()) {
+      console.log('Firestore data:', snapshot.data());
       callback(snapshot.data());
+    } else {
+      console.log('No data in Firestore yet');
     }
+  }, (error) => {
+    console.error('Firestore subscription error:', error);
   });
 }
 
 export async function saveState(state) {
-  await setDoc(STATE_DOC, state);
+  try {
+    console.log('Saving to Firestore:', state);
+    await setDoc(STATE_DOC, state, { merge: true });
+    console.log('Successfully saved to Firestore');
+  } catch (error) {
+    console.error('Error saving to Firestore:', error);
+    throw error;
+  }
 }
 
 export { db };

@@ -58,7 +58,7 @@ const PredictionForm = ({ onSubmit, existingPlayers, onCancel, teamNames, catego
       }
     }
 
-    onSubmit(playerName.trim(), predictions);
+    onSubmit(playerName.trim(), { ...predictions, selectedTeam: selectedTheme });
   };
 
   return (

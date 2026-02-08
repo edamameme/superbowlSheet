@@ -38,13 +38,35 @@ function App() {
 
   // Track whether updates come from Firestore listener to avoid write loops
   const isRemoteUpdate = useRef(false);
+  const lastRemoteData = useRef(null);
 
   // Sync state to Firestore (debounced to avoid rapid writes)
   const syncTimeout = useRef(null);
   const syncToFirestore = useCallback((state) => {
     if (syncTimeout.current) clearTimeout(syncTimeout.current);
-    syncTimeout.current = setTimeout(() => {
-      saveState(state);
+    syncTimeout.current = setTimeout(async () => {
+      // Merge local predictions with remote to avoid overwrites
+      const remotePredictions = lastRemoteData.current?.predictions || [];
+      const localPredictions = state.predictions || [];
+
+      // Create a map of all predictions, local ones take priority for same player
+      const predictionMap = new Map();
+      remotePredictions.forEach(p => predictionMap.set(p.playerName, p));
+      localPredictions.forEach(p => predictionMap.set(p.playerName, p));
+
+      const mergedPredictions = Array.from(predictionMap.values());
+
+      // Merge scores similarly
+      const mergedScores = {
+        ...(lastRemoteData.current?.scores || {}),
+        ...(state.scores || {})
+      };
+
+      saveState({
+        ...state,
+        predictions: mergedPredictions,
+        scores: mergedScores,
+      });
     }, 300);
   }, []);
 
@@ -52,6 +74,7 @@ function App() {
   useEffect(() => {
     const unsubscribe = subscribeToState((data) => {
       isRemoteUpdate.current = true;
+      lastRemoteData.current = data; // Store remote data for merging
       if (data.predictions) setPredictions(data.predictions);
       if (data.scores) setScores(data.scores);
       if (data.teamNames) setTeamNames(data.teamNames);
@@ -217,8 +240,13 @@ function App() {
               {predictions.length > 0 ? (
                 <ul className="players-list">
                   {predictions.map(p => (
-                    <li key={p.id}>
-                      {p.playerName} ✅
+                    <li key={p.id} className="player-item">
+                      <span className="player-name">{p.playerName}</span>
+                      <img
+                        src={`${import.meta.env.BASE_URL}${p.selectedTeam === 'patriots' ? 'patriots-logo.svg' : 'seahawks-logo.svg'}`}
+                        alt={p.selectedTeam === 'patriots' ? 'Patriots' : 'Seahawks'}
+                        className="player-team-logo"
+                      />
                     </li>
                   ))}
                 </ul>
