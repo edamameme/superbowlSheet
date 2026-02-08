@@ -143,6 +143,9 @@ function App() {
 
   const resetAll = () => {
     if (window.confirm('Are you sure you want to reset all predictions and scores?')) {
+      // Clear local cache of remote data so we don't merge it back in
+      lastRemoteData.current = { predictions: [], scores: {} };
+
       setPredictions([]);
       setScores({});
       setView('home');
