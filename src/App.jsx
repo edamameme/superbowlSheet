@@ -1,91 +1,94 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
 import PredictionForm from './components/PredictionForm';
 import AdminView from './components/AdminView';
 import Leaderboard from './components/Leaderboard';
 import MyPredictions from './components/MyPredictions';
+import { subscribeToState, saveState } from './firebase';
+
+const DEFAULT_CATEGORIES = [
+  { key: 'firstTDTime', label: 'First TD Time', type: 'text', pointValue: 10 },
+  { key: 'firstScoreTeam', label: 'First Score Team', type: 'radio', pointValue: 5 },
+  { key: 'finalScore', label: 'Final Score', type: 'score', pointValue: 10 },
+  { key: 'overtime', label: 'Overtime?', type: 'radio', pointValue: 5 },
+  { key: 'totalPoints', label: 'Total Points', type: 'number', pointValue: 10 },
+  { key: 'carCommercials', label: 'Car Commercials', type: 'number', pointValue: 10 },
+  { key: 'beerBrand', label: 'Beer Brand Most Ads', type: 'radio', pointValue: 5 },
+  { key: 'cryptoAd', label: 'Crypto Ad?', type: 'radio', pointValue: 5 },
+  { key: 'bestCommercial', label: 'Best Commercial', type: 'text', pointValue: 15 },
+  { key: 'weirdestCommercial', label: 'Weirdest Commercial', type: 'text', pointValue: 15 },
+  { key: 'openingSong', label: 'Opening Song', type: 'text', pointValue: 10 },
+  { key: 'closingSong', label: 'Closing Song', type: 'text', pointValue: 10 },
+  { key: 'totalSongs', label: 'Total Songs', type: 'number', pointValue: 10 },
+  { key: 'specialGuest', label: 'Special Guest', type: 'text', pointValue: 10 },
+  { key: 'costumeChanges', label: 'Costume Changes', type: 'number', pointValue: 10 },
+  { key: 'playBiggestHit', label: 'Play Biggest Hit?', type: 'radio', pointValue: 5 }
+];
 
 function App() {
-  const [view, setView] = useState('home'); // home, form, admin, leaderboard, myPredictions
+  const [view, setView] = useState('home');
   const [predictions, setPredictions] = useState([]);
   const [scores, setScores] = useState({});
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [predictionsLocked, setPredictionsLocked] = useState(false);
-
-  // Game settings
   const [teamNames, setTeamNames] = useState({ team1: 'Seattle Seahawks', team2: 'New England Patriots' });
-  const [theme, setTheme] = useState('seahawks'); // default, seahawks, patriots
-  const [categories, setCategories] = useState([
-    { key: 'firstTDTime', label: 'First TD Time', type: 'text', pointValue: 10 },
-    { key: 'firstScoreTeam', label: 'First Score Team', type: 'radio', pointValue: 5 },
-    { key: 'finalScore', label: 'Final Score', type: 'score', pointValue: 10 },
-    { key: 'overtime', label: 'Overtime?', type: 'radio', pointValue: 5 },
-    { key: 'totalPoints', label: 'Total Points', type: 'number', pointValue: 10 },
-    { key: 'carCommercials', label: 'Car Commercials', type: 'number', pointValue: 10 },
-    { key: 'beerBrand', label: 'Beer Brand Most Ads', type: 'radio', pointValue: 5 },
-    { key: 'cryptoAd', label: 'Crypto Ad?', type: 'radio', pointValue: 5 },
-    { key: 'bestCommercial', label: 'Best Commercial', type: 'text', pointValue: 15 },
-    { key: 'weirdestCommercial', label: 'Weirdest Commercial', type: 'text', pointValue: 15 },
-    { key: 'openingSong', label: 'Opening Song', type: 'text', pointValue: 10 },
-    { key: 'closingSong', label: 'Closing Song', type: 'text', pointValue: 10 },
-    { key: 'totalSongs', label: 'Total Songs', type: 'number', pointValue: 10 },
-    { key: 'specialGuest', label: 'Special Guest', type: 'text', pointValue: 10 },
-    { key: 'costumeChanges', label: 'Costume Changes', type: 'number', pointValue: 10 },
-    { key: 'playBiggestHit', label: 'Play Biggest Hit?', type: 'radio', pointValue: 5 }
-  ]);
+  const [theme, setTheme] = useState('seahawks');
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+  const [loaded, setLoaded] = useState(false);
 
-  // Load all data from localStorage on mount
-  useEffect(() => {
-    const savedPredictions = localStorage.getItem('superBowlPredictions');
-    const savedScores = localStorage.getItem('superBowlScores');
-    const savedTeamNames = localStorage.getItem('superBowlTeamNames');
-    const savedTheme = localStorage.getItem('superBowlTheme');
-    const savedCategories = localStorage.getItem('superBowlCategories');
-    const savedLocked = localStorage.getItem('superBowlPredictionsLocked');
+  // Track whether updates come from Firestore listener to avoid write loops
+  const isRemoteUpdate = useRef(false);
 
-    if (savedPredictions) setPredictions(JSON.parse(savedPredictions));
-    if (savedScores) setScores(JSON.parse(savedScores));
-    if (savedTeamNames) setTeamNames(JSON.parse(savedTeamNames));
-    if (savedTheme) setTheme(savedTheme);
-    if (savedCategories) setCategories(JSON.parse(savedCategories));
-    if (savedLocked) setPredictionsLocked(JSON.parse(savedLocked));
+  // Sync state to Firestore (debounced to avoid rapid writes)
+  const syncTimeout = useRef(null);
+  const syncToFirestore = useCallback((state) => {
+    if (syncTimeout.current) clearTimeout(syncTimeout.current);
+    syncTimeout.current = setTimeout(() => {
+      saveState(state);
+    }, 300);
   }, []);
 
-  // Save predictions to localStorage
+  // Subscribe to Firestore on mount
   useEffect(() => {
-    if (predictions.length > 0) {
-      localStorage.setItem('superBowlPredictions', JSON.stringify(predictions));
-    }
-  }, [predictions]);
+    const unsubscribe = subscribeToState((data) => {
+      isRemoteUpdate.current = true;
+      if (data.predictions) setPredictions(data.predictions);
+      if (data.scores) setScores(data.scores);
+      if (data.teamNames) setTeamNames(data.teamNames);
+      if (data.theme) setTheme(data.theme);
+      if (data.categories) setCategories(data.categories);
+      if (data.predictionsLocked !== undefined) setPredictionsLocked(data.predictionsLocked);
+      setLoaded(true);
+      // Reset flag after React processes the state updates
+      setTimeout(() => { isRemoteUpdate.current = false; }, 0);
+    });
 
-  // Save scores to localStorage
-  useEffect(() => {
-    if (Object.keys(scores).length > 0) {
-      localStorage.setItem('superBowlScores', JSON.stringify(scores));
-    }
-  }, [scores]);
+    // If no data exists in Firestore yet, mark as loaded after a timeout
+    const fallbackTimer = setTimeout(() => setLoaded(true), 2000);
 
-  // Save team names to localStorage
-  useEffect(() => {
-    localStorage.setItem('superBowlTeamNames', JSON.stringify(teamNames));
-  }, [teamNames]);
+    return () => {
+      unsubscribe();
+      clearTimeout(fallbackTimer);
+    };
+  }, []);
 
-  // Save theme to localStorage
+  // Sync all state changes to Firestore
   useEffect(() => {
-    localStorage.setItem('superBowlTheme', theme);
-    // Apply theme to document
+    if (!loaded || isRemoteUpdate.current) return;
+    syncToFirestore({
+      predictions,
+      scores,
+      teamNames,
+      theme,
+      predictionsLocked,
+      categories,
+    });
+  }, [predictions, scores, teamNames, theme, predictionsLocked, categories, loaded, syncToFirestore]);
+
+  // Apply theme to document
+  useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
-
-  // Save categories to localStorage
-  useEffect(() => {
-    localStorage.setItem('superBowlCategories', JSON.stringify(categories));
-  }, [categories]);
-
-  // Save predictions locked state to localStorage
-  useEffect(() => {
-    localStorage.setItem('superBowlPredictionsLocked', JSON.stringify(predictionsLocked));
-  }, [predictionsLocked]);
 
   const addPrediction = (playerName, predictionData) => {
     const newPrediction = {
@@ -100,7 +103,6 @@ function App() {
       return [...filtered, newPrediction];
     });
 
-    // Initialize score for new player
     setScores(prev => ({
       ...prev,
       [playerName]: prev[playerName] || 0
@@ -120,8 +122,6 @@ function App() {
     if (window.confirm('Are you sure you want to reset all predictions and scores?')) {
       setPredictions([]);
       setScores({});
-      localStorage.removeItem('superBowlPredictions');
-      localStorage.removeItem('superBowlScores');
       setView('home');
     }
   };
@@ -167,6 +167,19 @@ function App() {
     setPredictionsLocked(prev => !prev);
   };
 
+  if (!loaded) {
+    return (
+      <div className="app">
+        <header className="app-header">
+          <h1>🏈 Super Bowl Prediction Party 🏈</h1>
+        </header>
+        <main className="app-main">
+          <p style={{ textAlign: 'center', fontSize: '1.2rem', marginTop: '2rem' }}>Loading...</p>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -200,7 +213,7 @@ function App() {
             <p>Enter your predictions and compete with your friends!</p>
 
             <div className="players-status">
-              <h3>Players ({predictions.length}/4)</h3>
+              <h3>Players ({predictions.length})</h3>
               {predictions.length > 0 ? (
                 <ul className="players-list">
                   {predictions.map(p => (
@@ -214,14 +227,12 @@ function App() {
               )}
             </div>
 
-            {predictions.length < 4 && (
-              <button
-                onClick={() => setView('form')}
-                className="primary-button"
-              >
-                Enter Your Predictions
-              </button>
-            )}
+            <button
+              onClick={() => setView('form')}
+              className="primary-button"
+            >
+              Enter Your Predictions
+            </button>
 
             {predictions.length > 0 && (
               <div className="admin-actions">
